@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include <cmath>
 #include <iostream>
+#include <string>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb-master/stb_image.h"
 
@@ -14,12 +15,11 @@ const int windowHeight = 600;
 
 float angle = 0.0;
 
-
 float zoom = -150.0f; // Initialize the zoom value
 float rotationX = 0.0;
 float rotationY = 0.0;
 
-//Global Variables for Orbits
+// Global Variables for Orbits
 float mercuryOrbit = 0.0;
 float venusOrbit = 0.0;
 float earthOrbit = 0.0;
@@ -30,14 +30,15 @@ float saturnOrbit = 0.0;
 float uranusOrbit = 0.0;
 float neptuneOrbit = 0.0;
 
-
 GLuint sunTexture, mercuryTexture, venusTexture, earthTexture, moonTexture, marsTexture, jupiterTexture, saturnTexture, uranusTexture, neptuneTexture;
 GLuint saturnRingTexture, starsTexture;
 
-GLuint loadTexture(const char* filename) {
+GLuint loadTexture(const char *filename)
+{
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(filename, &width, &height, &nrChannels, 0);
-    if (!data) {
+    unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
+    if (!data)
+    {
         std::cerr << "Failed to load texture: " << filename << std::endl;
         return 0;
     }
@@ -46,11 +47,16 @@ GLuint loadTexture(const char* filename) {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    if (nrChannels == 3) {
+    if (nrChannels == 3)
+    {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    } else if (nrChannels == 4) {
+    }
+    else if (nrChannels == 4)
+    {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    } else {
+    }
+    else
+    {
         std::cerr << "Unsupported number of channels: " << nrChannels << std::endl;
         stbi_image_free(data);
         return 0;
@@ -63,30 +69,30 @@ GLuint loadTexture(const char* filename) {
     return textureID;
 }
 
-void loadTextures() {
-    sunTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\sun.png");
-    mercuryTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\mercury.png");
-    venusTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\venus.png");
-    earthTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\earth.png");
-    moonTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\moon.png");
-    marsTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\mars.png");
-    jupiterTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\jupiter.png");
-    saturnTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\saturn.png");
-    saturnRingTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\saturn_rings.png");
-    uranusTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\uranus.png");
-    neptuneTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\neptune.png");
-    starsTexture = loadTexture("C:\\Users\\Leul\\Documents\\Code Blocks Projects\\Glut\\Solar System\\stars.png");
+void loadTextures()
+{
+    sunTexture = loadTexture("Textures/sun.png");
+    mercuryTexture = loadTexture("Textures/mercury.png");
+    venusTexture = loadTexture("Textures/venus.png");
+    earthTexture = loadTexture("Textures/earth.png");
+    moonTexture = loadTexture("Textures/moon.png");
+    marsTexture = loadTexture("Textures/mars.png");
+    jupiterTexture = loadTexture("Textures/jupiter.png");
+    saturnTexture = loadTexture("Textures/saturn.png");
+    saturnRingTexture = loadTexture("Textures/saturn_rings.png");
+    uranusTexture = loadTexture("Textures/uranus.png");
+    neptuneTexture = loadTexture("Textures/neptune.png");
+    starsTexture = loadTexture("Textures/stars.png");
 
-    if (!sunTexture || !mercuryTexture || !venusTexture || !earthTexture || !moonTexture || !marsTexture || !jupiterTexture || !saturnTexture || !saturnRingTexture || !uranusTexture || !neptuneTexture || !starsTexture) {
+    // Simple error checking: replace 0 with whatever your loadTexture function returns on failure
+    if (!sunTexture || !mercuryTexture || !venusTexture || !earthTexture || !moonTexture || !marsTexture || !jupiterTexture || !saturnTexture || !saturnRingTexture || !uranusTexture || !neptuneTexture || !starsTexture)
+    {
         std::cerr << "Failed to load one or more textures" << std::endl;
-    }
-
-    if (saturnRingTexture == 0) {
-        std::cerr << "Failed to load Saturn ring texture" << std::endl;
     }
 }
 
-void init() {
+void init()
+{
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -111,18 +117,21 @@ void init() {
     glLightfv(GL_LIGHT1, GL_DIFFUSE, light1Diff);
 }
 
-
-void drawSphere(GLuint textureID, float radius) {
-    if (textureID != 0) {
+void drawSphere(GLuint textureID, float radius)
+{
+    if (textureID != 0)
+    {
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, textureID);
         glColor3f(1.0, 1.0, 1.0);
-    } else {
+    }
+    else
+    {
         glDisable(GL_TEXTURE_2D);
         glColor3f(1.0, 1.0, 0.0); // Example default color
     }
 
-    GLUquadric* quad = gluNewQuadric();
+    GLUquadric *quad = gluNewQuadric();
     gluQuadricTexture(quad, GL_TRUE);
     gluQuadricDrawStyle(quad, GLU_FILL);
     gluQuadricNormals(quad, GLU_SMOOTH);
@@ -130,30 +139,32 @@ void drawSphere(GLuint textureID, float radius) {
     gluSphere(quad, radius, 50, 50);
     gluDeleteQuadric(quad);
 
-    if (textureID != 0) {
+    if (textureID != 0)
+    {
         glDisable(GL_TEXTURE_2D);
     }
 }
 
-
-void drawSaturn(GLuint textureID, GLuint ringTextureID, float radius) {
+void drawSaturn(GLuint textureID, GLuint ringTextureID, float radius)
+{
     drawSphere(textureID, radius);
 
-    if (ringTextureID != 0) {
+    if (ringTextureID != 0)
+    {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, ringTextureID);
         glColor4f(1.0, 1.0, 1.0, 1.0);
 
-        GLUquadric* ring = gluNewQuadric();
+        GLUquadric *ring = gluNewQuadric();
         gluQuadricTexture(ring, GL_TRUE);
         gluQuadricDrawStyle(ring, GLU_FILL);
         gluQuadricNormals(ring, GLU_SMOOTH);
 
         glPushMatrix();
         glRotatef(90.0, 1.0, 0.0, 0.0);
-        gluDisk(ring, radius * 1.2, radius * 2.5, 50, 1);  // Adjusted ring size
+        gluDisk(ring, radius * 1.2, radius * 2.5, 50, 1); // Adjusted ring size
         glPopMatrix();
 
         gluDeleteQuadric(ring);
@@ -162,13 +173,16 @@ void drawSaturn(GLuint textureID, GLuint ringTextureID, float radius) {
     }
 
     GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
+    if (err != GL_NO_ERROR)
+    {
         std::cerr << "OpenGL error: " << gluErrorString(err) << std::endl;
     }
 }
 
-void drawSkybox() {
-    if (starsTexture != 0) {
+void drawSkybox()
+{
+    if (starsTexture != 0)
+    {
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, starsTexture);
         glColor3f(1.0, 1.0, 1.0);
@@ -179,40 +193,64 @@ void drawSkybox() {
         glBegin(GL_QUADS);
 
         // Front Face
-        glTexCoord2f(0.0, 0.0); glVertex3f(-size, -size, -size);
-        glTexCoord2f(1.0, 0.0); glVertex3f(size, -size, -size);
-        glTexCoord2f(1.0, 1.0); glVertex3f(size, size, -size);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-size, size, -size);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-size, -size, -size);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(size, size, -size);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-size, size, -size);
 
         // Back Face
-        glTexCoord2f(0.0, 0.0); glVertex3f(size, -size, size);
-        glTexCoord2f(1.0, 0.0); glVertex3f(-size, -size, size);
-        glTexCoord2f(1.0, 1.0); glVertex3f(-size, size, size);
-        glTexCoord2f(0.0, 1.0); glVertex3f(size, size, size);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(size, -size, size);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(-size, -size, size);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(-size, size, size);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(size, size, size);
 
         // Top Face
-        glTexCoord2f(0.0, 0.0); glVertex3f(-size, size, -size);
-        glTexCoord2f(1.0, 0.0); glVertex3f(size, size, -size);
-        glTexCoord2f(1.0, 1.0); glVertex3f(size, size, size);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-size, size, size);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-size, size, -size);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(size, size, -size);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(size, size, size);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-size, size, size);
 
         // Bottom Face
-        glTexCoord2f(0.0, 0.0); glVertex3f(-size, -size, size);
-        glTexCoord2f(1.0, 0.0); glVertex3f(size, -size, size);
-        glTexCoord2f(1.0, 1.0); glVertex3f(size, -size, -size);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-size, -size, -size);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-size, -size, size);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(size, -size, size);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-size, -size, -size);
 
         // Right face
-        glTexCoord2f(0.0, 0.0); glVertex3f(size, -size, -size);
-        glTexCoord2f(1.0, 0.0); glVertex3f(size, -size, size);
-        glTexCoord2f(1.0, 1.0); glVertex3f(size, size, size);
-        glTexCoord2f(0.0, 1.0); glVertex3f(size, size, -size);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(size, -size, size);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(size, size, size);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(size, size, -size);
 
         // Left Face
-        glTexCoord2f(0.0, 0.0); glVertex3f(-size, -size, size);
-        glTexCoord2f(1.0, 0.0); glVertex3f(-size, -size, -size);
-        glTexCoord2f(1.0, 1.0); glVertex3f(-size, size, -size);
-        glTexCoord2f(0.0, 1.0); glVertex3f(-size, size, size);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-size, -size, size);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(-size, -size, -size);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(-size, size, -size);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(-size, size, size);
 
         glEnd();
         glPopMatrix();
@@ -221,8 +259,8 @@ void drawSkybox() {
     }
 }
 
-
-void display() {
+void display()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -242,26 +280,26 @@ void display() {
     // Draw Mercury
     glPushMatrix();
     glRotatef(mercuryOrbit, 0.0, 1.0, 0.0); // Mercury's orbit around the Sun
-    glTranslatef(30.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(30.0, 0.0, 0.0);           // Distance from the Sun
     drawSphere(mercuryTexture, 0.38);
     glPopMatrix();
 
     // Draw Venus
     glPushMatrix();
     glRotatef(venusOrbit, 0.0, 1.0, 0.0); // Venus's orbit around the Sun
-    glTranslatef(50.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(50.0, 0.0, 0.0);         // Distance from the Sun
     drawSphere(venusTexture, 0.95);
     glPopMatrix();
 
     // Draw Earth and Moon
     glPushMatrix();
     glRotatef(earthOrbit, 0.0, 1.0, 0.0); // Earth's orbit around the Sun
-    glTranslatef(70.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(70.0, 0.0, 0.0);         // Distance from the Sun
     drawSphere(earthTexture, 1.0);
 
     glPushMatrix();
     glRotatef(moonOrbit, 0.0, 1.0, 0.0); // Moon's orbit around the Earth
-    glTranslatef(3.0, 0.0, 0.0); // Distance from the Earth
+    glTranslatef(3.0, 0.0, 0.0);         // Distance from the Earth
     drawSphere(moonTexture, 0.27);
     glPopMatrix();
 
@@ -270,52 +308,52 @@ void display() {
     // Draw Mars
     glPushMatrix();
     glRotatef(marsOrbit, 0.0, 1.0, 0.0); // Mars's orbit around the Sun
-    glTranslatef(100.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(100.0, 0.0, 0.0);       // Distance from the Sun
     drawSphere(marsTexture, 0.53);
     glPopMatrix();
 
     // Draw Jupiter
     glPushMatrix();
     glRotatef(jupiterOrbit, 0.0, 1.0, 0.0); // Jupiter's orbit around the Sun
-    glTranslatef(140.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(140.0, 0.0, 0.0);          // Distance from the Sun
     drawSphere(jupiterTexture, 11.0);
     glPopMatrix();
 
     // Draw Saturn
     glPushMatrix();
     glRotatef(saturnOrbit, 0.0, 1.0, 0.0); // Saturn's orbit around the Sun
-    glTranslatef(190.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(190.0, 0.0, 0.0);         // Distance from the Sun
     drawSaturn(saturnTexture, saturnRingTexture, 9.0);
     glPopMatrix();
 
     // Draw Uranus
     glPushMatrix();
     glRotatef(uranusOrbit, 0.0, 1.0, 0.0); // Uranus's orbit around the Sun
-    glTranslatef(250.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(250.0, 0.0, 0.0);         // Distance from the Sun
     drawSphere(uranusTexture, 4.0);
     glPopMatrix();
 
     // Draw Neptune
     glPushMatrix();
     glRotatef(neptuneOrbit, 0.0, 1.0, 0.0); // Neptune's orbit around the Sun
-    glTranslatef(300.0, 0.0, 0.0); // Distance from the Sun
+    glTranslatef(300.0, 0.0, 0.0);          // Distance from the Sun
     drawSphere(neptuneTexture, 3.9);
     glPopMatrix();
 
     glutSwapBuffers();
 }
 
-
-void update(int value) {
-    angle += 0.5; // Increment Sun's rotation angle
+void update(int value)
+{
+    angle += 0.5;        // Increment Sun's rotation angle
     mercuryOrbit += 1.5; // Increment Mercury's orbit
-    venusOrbit += 1.2; // Increment Venus' orbit
-    earthOrbit += 1.0; // Increment Earth's orbit
-    moonOrbit += 6.0; // Increment Moon's orbit
-    marsOrbit += 0.9; // Increment Mars' orbit
+    venusOrbit += 1.2;   // Increment Venus' orbit
+    earthOrbit += 1.0;   // Increment Earth's orbit
+    moonOrbit += 6.0;    // Increment Moon's orbit
+    marsOrbit += 0.9;    // Increment Mars' orbit
     jupiterOrbit += 0.7; // Increment Jupiter's orbit
-    saturnOrbit += 0.5; // Increment Saturn's orbit
-    uranusOrbit += 0.3; // Increment Uranus' orbit
+    saturnOrbit += 0.5;  // Increment Saturn's orbit
+    uranusOrbit += 0.3;  // Increment Uranus' orbit
     neptuneOrbit += 0.2; // Increment Neptune's orbit
 
     // Keep orbit angles in the range of 0-360
@@ -330,12 +368,11 @@ void update(int value) {
     neptuneOrbit = fmod(neptuneOrbit, 360.0);
 
     glutPostRedisplay();
-    glutTimerFunc(16, update, 0);  // Update every 16ms (approx. 60 FPS)
+    glutTimerFunc(16, update, 0); // Update every 16ms (approx. 60 FPS)
 }
 
-
-
-void reshape(int w, int h) {
+void reshape(int w, int h)
+{
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -344,9 +381,10 @@ void reshape(int w, int h) {
     glLoadIdentity();
 }
 
-
-void keyboard(unsigned char key, int x, int y) {
-    switch (key) {
+void keyboard(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
     case 27: // Escape key
         exit(0);
         break;
@@ -372,20 +410,27 @@ void keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void mouse(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_DOWN) {
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_LEFT_BUTTON)
+    {
+        if (state == GLUT_DOWN)
+        {
             isMouseDragging = true;
             lastMouseX = x;
             lastMouseY = y;
-        } else if (state == GLUT_UP) {
+        }
+        else if (state == GLUT_UP)
+        {
             isMouseDragging = false;
         }
     }
 }
 
-void motion(int x, int y) {
-    if (isMouseDragging) {
+void motion(int x, int y)
+{
+    if (isMouseDragging)
+    {
         rotationY += (x - lastMouseX) * 0.5;
         rotationX += (y - lastMouseY) * 0.5;
         lastMouseX = x;
@@ -394,7 +439,8 @@ void motion(int x, int y) {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(windowWidth, windowHeight);
